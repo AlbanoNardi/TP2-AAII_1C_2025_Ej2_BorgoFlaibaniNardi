@@ -34,20 +34,50 @@ class QAgent(Agent):
         Discretiza el estado continuo en un estado discreto (tupla).
         COMPLETAR: Implementar la discretización adecuada para el entorno.
         """
-        # Ejemplo:
-        # return (player_y_bin, player_vel_bin, ...)
-        raise NotImplementedError("Completar la función de discretización de estado")
+        player_y = state['player_y']/self.game.height
+        player_vel = (state['player_vel']+10)/20#self.player.MAX_DROP_SPEED '¡¡^^**¿??[}{[]}]
+        pipe_dist = state['next_pipe_dist_to_player']/self.game.width
+        next_pipe_dist = state['next_next_pipe_dist_to_player']/self.game.width
+        pipe_top_y = state['next_pipe_top_y']/self.game.height
+        pipe_bottom_y = state['next_pipe_bottom_y']/self.game.height
+        next_pipe_top_y = state['next_next_pipe_top_y']/self.game.height
+        #next_pipe_bottom_y = state['next_next_pipe_bottom_y']/self.game.height
+
+        pipe_center_y = (pipe_top_y + pipe_bottom_y)/2
+        delta_y = pipe_center_y - player_y
+        next_pipe_rel_pos = next_pipe_top_y - pipe_top_y
+
+        num_bins = 5
+        player_y_bin = int(np.clip(player_y * num_bins, 0, num_bins - 1))
+        player_vel_bin = int(np.clip(player_vel * num_bins, 0, num_bins - 1))
+        next_pipe_dist_bin = int(np.clip(next_pipe_dist * num_bins, 0, num_bins - 1))
+        #delta_y_bin = int(np.clip(delta_y * num_bins, 0, num_bins - 1))
+
+        delta_y_normalized = (delta_y + 1) / 2  # Convertir de [-1,1] a [0,1]
+        delta_y_bin = int(np.clip(delta_y_normalized * num_bins, 0, num_bins - 1))
+        
+        next_pipe_rel_pos_bin = int(np.sign(next_pipe_rel_pos))
+
+        return (player_y_bin, player_vel_bin, next_pipe_dist_bin, delta_y_bin, next_pipe_rel_pos_bin)
 
     def act(self, state):
-        """
-        Elige una acción usando epsilon-greedy sobre la Q-table.
+        
+        """Elige una acción usando epsilon-greedy sobre la Q-table.
         COMPLETAR: Implementar la política epsilon-greedy.
         """
+        discrete_state = self.discretize_state(state)
+        #print(discrete_state)
+        if (np.random.rand(1) < self.epsilon)[0] : # Exploración
+            # Elegir una acción aleatoria
+            return np.random.choice(self.actions)
+        else: # Explotación
+            # Usar la Q-table para elegir la mejor acción
+            q_values = self.q_table[discrete_state]
+            return self.actions[np.argmax(q_values)]
         # Sugerencia:
         # - Discretizar el estado
         # - Con probabilidad epsilon elegir acción aleatoria
         # - Si no, elegir acción con mayor Q-value
-        raise NotImplementedError("Completar la función de selección de acción (act)")
 
     def update(self, state, action, reward, next_state, done):
         """
