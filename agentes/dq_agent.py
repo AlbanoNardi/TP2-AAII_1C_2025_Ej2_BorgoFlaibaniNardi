@@ -27,57 +27,67 @@ class QAgent(Agent):
                 self.q_table = defaultdict(lambda: np.zeros(len(self.actions)))
         else:
             self.q_table = defaultdict(lambda: np.zeros(len(self.actions)))
-        # TODO: Definir parámetros de discretización según el entorno
 
     def discretize_state(self, state):
-        """
-        Discretiza el estado continuo en un estado discreto (tupla).
-        COMPLETAR: Implementar la discretización adecuada para el entorno.
-        """
-        player_y = state['player_y']/self.game.height
-        player_vel = (state['player_vel']+10)/20#self.player.MAX_DROP_SPEED '¡¡^^**¿??[}{[]}]
-        pipe_dist = state['next_pipe_dist_to_player']/self.game.width
-        next_pipe_dist = state['next_next_pipe_dist_to_player']/self.game.width
-        pipe_top_y = state['next_pipe_top_y']/self.game.height
-        pipe_bottom_y = state['next_pipe_bottom_y']/self.game.height
-        next_pipe_top_y = state['next_next_pipe_top_y']/self.game.height
-        #next_pipe_bottom_y = state['next_next_pipe_bottom_y']/self.game.height
+        """Discretiza el estado continuo en un estado discreto para Q-learning."""
 
-        pipe_center_y = (pipe_top_y + pipe_bottom_y)/2
-        delta_y = pipe_center_y - player_y
-        next_pipe_rel_pos = next_pipe_top_y - pipe_top_y
-
-        num_bins = 5
-        player_y_bin = int(np.clip(player_y * num_bins, 0, num_bins - 1))
-        player_vel_bin = int(np.clip(player_vel * num_bins, 0, num_bins - 1))
-        next_pipe_dist_bin = int(np.clip(next_pipe_dist * num_bins, 0, num_bins - 1))
-        #delta_y_bin = int(np.clip(delta_y * num_bins, 0, num_bins - 1))
-
-        delta_y_normalized = (delta_y + 1) / 2  # Convertir de [-1,1] a [0,1]
-        delta_y_bin = int(np.clip(delta_y_normalized * num_bins, 0, num_bins - 1))
+        # Variables básicas del estado
+        player_y = state['player_y']
+        player_vel = state['player_vel']
+        pipe_dist = state['next_pipe_dist_to_player']
+        next_pipe_dist = state['next_next_pipe_dist_to_player']
+        pipe_top_y = state['next_pipe_top_y']
+        pipe_bottom_y = state['next_pipe_bottom_y']
+        next_pipe_top_y = state['next_next_pipe_top_y']
         
-        next_pipe_rel_pos_bin = int(np.sign(next_pipe_rel_pos))
+        # Feature engineering mejorado
+        pipe_center_y = (pipe_top_y + pipe_bottom_y) / 2
+        pipe_gap_height = pipe_bottom_y - pipe_top_y
+        player_pos = int(player_y > pipe_center_y) 
+                                
+        # Posición relativa del jugador respecto al tubo
+        player_relative_y = (player_y - pipe_center_y) / pipe_gap_height
+        if player_relative_y > 0.3:
+            player_zone = 2  # Arriba del centro
+        elif player_relative_y < -0.3:
+            player_zone = 0  # Abajo del centro
+        else:
+            player_zone = 1  # En el centro (zona segura)
+        
+        # Distancia normalizada al próximo tubo
+        pipe_dist_norm = pipe_dist / (next_pipe_dist - pipe_dist)
+        if pipe_dist_norm > 0.66:
+            dist_zone = 2  # Lejos
+        elif pipe_dist_norm > 0.33:
+            dist_zone = 1  # Medio
+        else:
+            dist_zone = 0  # Cerca
+        
+        # Diferencia de altura entre tubos consecutivos (tendencia del terreno)
+        pipe_height_trend = np.sign(next_pipe_top_y - pipe_top_y)
 
-        return (player_y_bin, player_vel_bin, next_pipe_dist_bin, delta_y_bin, next_pipe_rel_pos_bin)
+        player_vel_norm = (player_vel + 10) / 20  # Velocidad normalizada
+
+        player_vel_bin = int(np.clip(player_vel_norm * 4, 0, 3))
+
+        
+        return (
+            player_pos,
+            player_vel_bin, 
+            int(pipe_height_trend >= 0),
+            player_zone,
+            dist_zone
+        )
 
     def act(self, state):
-        
-        """Elige una acción usando epsilon-greedy sobre la Q-table.
-        COMPLETAR: Implementar la política epsilon-greedy.
-        """
+        """Elige una acción usando epsilon-greedy sobre la Q-table."""
         discrete_state = self.discretize_state(state)
-        #print(discrete_state)
-        if (np.random.rand(1) < self.epsilon)[0] : # Exploración
-            # Elegir una acción aleatoria
+        
+        if np.random.rand() < self.epsilon:
             return np.random.choice(self.actions)
-        else: # Explotación
-            # Usar la Q-table para elegir la mejor acción
+        else:
             q_values = self.q_table[discrete_state]
             return self.actions[np.argmax(q_values)]
-        # Sugerencia:
-        # - Discretizar el estado
-        # - Con probabilidad epsilon elegir acción aleatoria
-        # - Si no, elegir acción con mayor Q-value
 
     def update(self, state, action, reward, next_state, done):
         """
