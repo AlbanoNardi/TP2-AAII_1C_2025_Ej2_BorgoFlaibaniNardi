@@ -9,7 +9,7 @@ class QAgent(Agent):
     Completar la discretización del estado y la función de acción.
     """
     def __init__(self, actions, game=None, learning_rate=0.1, discount_factor=0.99,
-                 epsilon=1.0, epsilon_decay=0.995, min_epsilon=0.01, load_q_table_path="flappy_birds_q_table.pkl"):
+                 epsilon=0, epsilon_decay=0.995, min_epsilon=0, load_q_table_path="flappy_birds_q_table.pkl"):
         super().__init__(actions, game)
         self.lr = learning_rate
         self.gamma = discount_factor

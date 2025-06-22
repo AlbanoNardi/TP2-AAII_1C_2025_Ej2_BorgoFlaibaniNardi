@@ -22,20 +22,23 @@ y = np.array(y)
 # --- Definir la red neuronal ---
 model = keras.Sequential([
     # COMPLETAR: Definir la arquitectura de la red neuronal
+    layers.Input(shape=(5,)),
+    layers.Dense(15, activation='relu'),
+    # salida con 2 neuronas para las acciones (arriba, nada)
+    layers.Dense(2, activation = 'linear') # usamos 'linear' porque es una regresión
 ])
 
-model.compile(optimizer='adam', loss='mse')
+model.compile(optimizer='adam', loss='mse', metrics=['mae'])
 
 # --- Entrenar la red neuronal ---
-# COMPLETAR: Ajustar hiperparámetros según sea necesario
-# model.fit(X, y, ... demas opciones de entrenamiento ...)
-
+model.fit(X, y, epochs = 200, batch_size = 32)
 # --- Mostrar resultados del entrenamiento ---
 # Completar: Imprimir métricas de entrenamiento
 
+
 # --- Guardar el modelo entrenado ---
 # COMPLETAR: Cambia el nombre si lo deseas
-model.save('flappy_q_nn_model')
+model.save('flappy_q_nn_model.keras')
 print('Modelo guardado como TensorFlow SavedModel en flappy_q_nn_model/')
 
 # --- Notas para los alumnos ---
