@@ -56,19 +56,32 @@ Se observa un desempeño variable pero con episodios de alto rendimiento, lo que
 
 ---
 
-## Ejercicio B: Agente con Deep Q-Learning (⚠️ en desarrollo)
+## Ejercicio B: Agente con Deep Q-Learning
 
-### 🔄 Entrenamiento de la Red Neuronal
+### 🧠 Entrenamiento de la Red Neuronal
 
-*Pendiente de implementación.*
+Para este agente, se utilizó una red neuronal entrenada para aproximar la Q-table aprendida previamente por el agente basado en Q-learning. La red fue entrenada usando como dataset las tuplas `(estado_discretizado, acción óptima)` extraídas de la Q-table entrenada, lo que permite al modelo generalizar el comportamiento aprendido sin necesidad de explorar nuevamente el entorno.
+
+La red se guardó como un modelo `TensorFlow SavedModel` en el archivo `flappy_q_nn_model.keras`.
 
 ### 🤖 Implementación del Agente Neuronal
 
-*Pendiente de implementación.*
+El agente neuronal, implementado en la clase `NNAgent`, utiliza la misma función de discretización que el agente de Q-learning, manteniendo así la coherencia en la representación del estado. Sin embargo, en lugar de consultar una tabla, el agente pasa el estado discretizado como input a la red neuronal y selecciona la acción con mayor valor Q predicho.
+
+Esto le permite tomar decisiones más rápidas y adaptarse mejor a estados no vistos exactamente durante el entrenamiento.
 
 ### 🧪 Prueba del Agente Neuronal
 
-*Pendiente de implementación.*
+Resultados de los episodios de prueba del agente con red neuronal:
+```
+Episodio 1: Recompensa = 411.0
+Episodio 2: Recompensa = 188.0
+Episodio 3: Recompensa = 33.0
+Episodio 4: Recompensa = 1097.0
+```
+
+Se observan recompensas significativamente altas en algunos episodios, lo que indica que el modelo neuronal logró generalizar correctamente la política aprendida y, en ocasiones, superó el rendimiento del agente basado en tabla.
+
 
 ---
 
@@ -106,4 +119,24 @@ pip install -r requirements.txt
 
 ---
 
-## Créditos
+## Conclusiones
+
+### Ingeniería de Características
+
+Para ambos agentes se aplicó la misma ingeniería de características, permitiendo representar el entorno continuo del juego mediante una tupla de 5 valores discretos:
+
+- Posición vertical relativa del jugador respecto al centro del tubo (3 zonas)
+- Velocidad vertical discretizada en 4 niveles
+- Tendencia de altura entre tubos consecutivos (ascendente o no)
+- Posición binaria del jugador (arriba o abajo del centro)
+- Distancia normalizada al siguiente tubo (3 zonas)
+
+Esto da lugar a **144 combinaciones posibles de estado**, lo cual permite construir una Q-table de tamaño razonable y suficientemente expresiva para el agente basado en Q-learning, y también sirve como entrada de bajo dimensionalidad para la red neuronal.
+
+### Comparación de Resultados
+
+Ambos agentes mostraron un rendimiento competente. El agente de Q-learning aprendió una política sólida con recompensas elevadas en muchos episodios. Sin embargo, el agente con red neuronal logró resultados incluso superiores en algunos casos, alcanzando una recompensa de **1097.0** en un episodio, gracias a su capacidad de generalizar más allá de los estados vistos en la tabla.
+
+La inclusión de una pequeña recompensa por supervivencia resultó clave para estabilizar el aprendizaje en ambos modelos.
+
+En conclusión, aunque el Q-learning es eficaz para este entorno simple, el uso de redes neuronales permite mayor flexibilidad y escalabilidad para escenarios más complejos.
