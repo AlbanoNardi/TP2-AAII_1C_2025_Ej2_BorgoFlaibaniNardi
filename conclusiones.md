@@ -157,17 +157,6 @@ python test_agent.py --agent dqn
 ├── test_agent.py
 ├── train_q_agent.py
 └── train_q_nn.py
-
-requirements.txt
-clone template
-5 days ago
-test_agent.py
-clone template
-5 days ago
-train_q_agent.py
-NN entrenado. Bugfix en DQagent
-6 hours ago
-train_q_nn.py
 ```
 
 ---
