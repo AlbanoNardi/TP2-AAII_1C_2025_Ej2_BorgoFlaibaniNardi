@@ -97,14 +97,77 @@ python test_agent.py --agent dqn
 ## Estructura del Proyecto
 
 ```
-├── agents/
-│   ├── q_learning_agent.py
-│   └── dqn_agent.py
-├── test_agent.py
-├── train_agent.py
-├── conclusiones.md
+├── .vscode/
+│   └── settings.json
+├── agentes/
+│   ├── __init__.py
+│   ├── base.py
+│   ├── dq_agent.py
+│   ├── manual_agent.py
+│   ├── nn_agent.py
+│   └── random_agent.py
+├── ple/
+│   ├── games/
+│   │   ├── base/
+│   │   │   ├── __init__.py
+│   │   │   ├── doomwrapper.py
+│   │   │   └── pygamewrapper.py
+│   │   ├── doom/
+│   │   │   ├── __init__.py
+│   │   │   └── doom.py
+│   │   ├── flappybird/
+│   │   │   ├── assets/
+│   │   │   └── __init__.py
+│   │   ├── monsterkong/
+│   │   │   ├── LICENSE
+│   │   │   ├── __init__.py
+│   │   │   ├── board.py
+│   │   │   ├── coin.py
+│   │   │   ├── fireball.py
+│   │   │   ├── ladder.py
+│   │   │   ├── monsterPerson.py
+│   │   │   ├── onBoard.py
+│   │   │   ├── person.py
+│   │   │   ├── player.py
+│   │   │   └── wall.py
+│   │   ├── utils/
+│   │   │   ├── __init__.py
+│   │   │   └── vec2d.py
+│   │   ├── __init__.py
+│   │   ├── catcher.py
+│   │   ├── pixelcopter.py
+│   │   ├── pong.py
+│   │   ├── primitives.py
+│   │   ├── puckworld.py
+│   │   ├── raycast.py
+│   │   ├── raycastmaze.py
+│   │   ├── snake.py
+│   │   └── waterworld.py
+│   ├── __init__.py
+│   └── ple.py
+├── test/
+│   ├── FlappyScores.png
+│   └── NNScores.png
+├── .gitignore
 ├── README.md
-└── requirements.txt
+├── conclusiones.md
+├── flappy_birds_q_table.pkl
+├── flappy_q_nn_model.keras
+├── requirements.txt
+├── test_agent.py
+├── train_q_agent.py
+└── train_q_nn.py
+
+requirements.txt
+clone template
+5 days ago
+test_agent.py
+clone template
+5 days ago
+train_q_agent.py
+NN entrenado. Bugfix en DQagent
+6 hours ago
+train_q_nn.py
 ```
 
 ---
