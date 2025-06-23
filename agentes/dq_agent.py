@@ -81,11 +81,11 @@ class QAgent(Agent):
 
     def act(self, state):
         """Elige una acción usando epsilon-greedy sobre la Q-table."""
-        discrete_state = self.discretize_state(state)
+        discrete_state = self.discretize_state(state)   # discretiza el estado continuo
         
-        if np.random.rand() < self.epsilon:
+        if np.random.rand() < self.epsilon:         # según epsilon, elegir acción aleatoria (exploración)
             return np.random.choice(self.actions)
-        else:
+        else:                                       # si no, elige la acción con mayor valor Q (explotación)
             q_values = self.q_table[discrete_state]
             return self.actions[np.argmax(q_values)]
 

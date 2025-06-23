@@ -65,10 +65,9 @@ class NNAgent(Agent):
 
     def act(self, state):
         """Elige una acción basada en el estado actual utilizando la red neuronal."""
-        # Obtener el estado discretizado
-        state_values = self.get_state(state)
-        state_values = np.array(state_values, dtype=np.float32).reshape(1, -1)
-        actions = self.model(state_values, training = False).numpy()[0]
-        action_index = np.argmax(actions)
+        state_values = self.get_state(state)                                    # discretización del estado continuo
+        state_values = np.array(state_values, dtype=np.float32).reshape(1, -1)  # convertir estado a array float32
+        actions = self.model(state_values, training=False).numpy()[0]           # Predice los valores Q para cada acción usando la red neuronal
+        action_index = np.argmax(actions)                                       # acción con el valor Q más alto
 
         return self.actions[action_index]
